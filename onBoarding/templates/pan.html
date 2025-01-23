@@ -46,6 +46,12 @@
             <img id="detectedFaceImage" class="mx-auto max-w-full hidden shadow-lg rounded-lg" alt="Detected Face" />
         </div>
 
+        <div id="downloadSection" class="mt-4 hidden text-center">
+            <button id="downloadButton" class="bg-green-500 text-white px-4 py-2 rounded-lg">
+                Download Detected Face
+            </button>
+        </div>
+
         <div id="errorMessage" class="text-red-500 text-center mt-4 hidden"></div>
     </div>
 
@@ -57,6 +63,8 @@
         const previewImage = document.getElementById('previewImage');
         const dropText = document.getElementById('dropText');
         const errorMessage = document.getElementById('errorMessage');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadButton = document.getElementById('downloadButton');
 
         // Drag and drop functionality
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -109,7 +117,7 @@
                 previewImage.src = e.target.result;
                 previewImage.classList.remove('hidden');
                 dropText.classList.add('hidden');
-                
+
                 detectFaceButton.disabled = false;
                 detectFaceButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 detectFaceButton.classList.add('hover:bg-blue-600');
@@ -142,12 +150,20 @@
                 detectedFaceImage.src = url;
                 detectedFaceImage.classList.remove('hidden');
                 detectedFaceImage.classList.add('fade-in');
-                
+
+                downloadSection.classList.remove('hidden');
                 errorMessage.classList.add('hidden');
             } catch (error) {
                 console.error('Face detection error:', error);
                 showError('Error detecting face. Please try again.');
             }
+        });
+
+        downloadButton.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = detectedFaceImage.src;
+            link.download = 'detected-face.jpg';
+            link.click();
         });
 
         function showError(message) {
