@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Card Face Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .drop-zone {
+            border: 2px dashed #cbd5e0;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .drop-zone.drag-over {
+            border-color: #4299e1;
+            background-color: rgba(66, 153, 225, 0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">ID Card Face Detection</h1>
+        
+        <div id="dropZone" class="drop-zone p-6 text-center cursor-pointer">
+            <input type="file" id="panImageInput" accept="image/*" class="hidden" />
+            <div id="dropText" class="text-gray-500">
+                Drag and drop or click to upload ID card
+            </div>
+            <img id="previewImage" class="mx-auto mt-4 max-h-40 hidden" />
+        </div>
+
+        <div class="mt-4 text-center">
+            <button id="detectFaceButton" disabled class="bg-blue-500 text-white px-4 py-2 rounded-lg opacity-50 cursor-not-allowed transition-all">
+                Detect Face
+            </button>
+        </div>
+
+        <div class="mt-6">
+            <img id="detectedFaceImage" class="mx-auto max-w-full hidden shadow-lg rounded-lg" alt="Detected Face" />
+        </div>
+
+        <div id="errorMessage" class="text-red-500 text-center mt-4 hidden"></div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const input = document.getElementById('panImageInput');
+        const detectFaceButton = document.getElementById('detectFaceButton');
+        const detectedFaceImage = document.getElementById('detectedFaceImage');
+        const previewImage = document.getElementById('previewImage');
+        const dropText = document.getElementById('dropText');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('drag-over');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('drag-over');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        input.addEventListener('change', handleFiles, false);
+        dropZone.addEventListener('click', () => input.click());
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFileUpload(files[0]);
+        }
+
+        function handleFiles() {
+            handleFileUpload(input.files[0]);
+        }
+
+        function handleFileUpload(file) {
+            if (!file || !file.type.match('image.*')) {
+                showError('Please upload a valid image file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.classList.remove('hidden');
+                dropText.classList.add('hidden');
+                
+                detectFaceButton.disabled = false;
+                detectFaceButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                detectFaceButton.classList.add('hover:bg-blue-600');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        detectFaceButton.addEventListener('click', async () => {
+            if (!input.files.length) {
+                showError('Please upload an ID card image first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', input.files[0]);
+
+            try {
+                const response = await fetch('/detect-face', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to detect face');
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+
+                detectedFaceImage.src = url;
+                detectedFaceImage.classList.remove('hidden');
+                detectedFaceImage.classList.add('fade-in');
+                
+                errorMessage.classList.add('hidden');
+            } catch (error) {
+                console.error('Face detection error:', error);
+                showError('Error detecting face. Please try again.');
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
