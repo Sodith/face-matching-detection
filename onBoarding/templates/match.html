@@ -1,332 +1,332 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Face Matching</title>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            position: relative;
-        }
-        .video-container {
-            position: relative;
-            width: 640px;
-            height: 480px;
-            margin: 20px auto;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        video, .match-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .match-frame {
-            opacity: 0;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            transition: background-color 0.3s, opacity 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        #stopMatchButton {
-            background-color: #dc3545;
-        }
-        #stopMatchButton:hover {
-            background-color: #c82333;
-        }
-        #refreshButton {
-            background-color: #28a745;
-        }
-        #refreshButton:hover {
-            background-color: #218838;
-        }
-        p {
-            color: #666;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        .status-success {
-            color: #28a745;
-        }
-        .status-error {
-            color: #dc3545;
-        }
-        .status-warning {
-            color: #ffc107;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>Face Matching</h1>
-    <button id="startMatchButton">Start Match</button>
-    <button id="stopMatchButton">Stop Match</button>
-    <button id="refreshButton">Refresh</button>
-    <div class="video-container">
-        <video id="video" autoplay playsinline></video>
-        <img id="matchFrame" class="match-frame" alt="Matched face frame" />
-    </div>
-    <p id="status">Waiting to start...</p>
-</div>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Face Matching</title>-->
+<!--    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            height: 100vh;-->
+<!--            margin: 0;-->
+<!--            background-color: #f0f0f0;-->
+<!--        }-->
+<!--        .container {-->
+<!--            background: #fff;-->
+<!--            padding: 20px;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);-->
+<!--            text-align: center;-->
+<!--            position: relative;-->
+<!--        }-->
+<!--        .video-container {-->
+<!--            position: relative;-->
+<!--            width: 640px;-->
+<!--            height: 480px;-->
+<!--            margin: 20px auto;-->
+<!--            border-radius: 10px;-->
+<!--            overflow: hidden;-->
+<!--        }-->
+<!--        video, .match-frame {-->
+<!--            position: absolute;-->
+<!--            top: 0;-->
+<!--            left: 0;-->
+<!--            width: 100%;-->
+<!--            height: 100%;-->
+<!--            object-fit: cover;-->
+<!--            border-radius: 10px;-->
+<!--            transition: opacity 0.5s ease-in-out;-->
+<!--        }-->
+<!--        .match-frame {-->
+<!--            opacity: 0;-->
+<!--        }-->
+<!--        button {-->
+<!--            padding: 10px 20px;-->
+<!--            margin: 10px;-->
+<!--            border-radius: 5px;-->
+<!--            font-size: 16px;-->
+<!--            cursor: pointer;-->
+<!--            background-color: #007bff;-->
+<!--            color: #fff;-->
+<!--            border: none;-->
+<!--            transition: background-color 0.3s, opacity 0.3s;-->
+<!--        }-->
+<!--        button:hover {-->
+<!--            background-color: #0056b3;-->
+<!--        }-->
+<!--        button:disabled {-->
+<!--            background-color: #ccc;-->
+<!--            cursor: not-allowed;-->
+<!--            opacity: 0.7;-->
+<!--        }-->
+<!--        #stopMatchButton {-->
+<!--            background-color: #dc3545;-->
+<!--        }-->
+<!--        #stopMatchButton:hover {-->
+<!--            background-color: #c82333;-->
+<!--        }-->
+<!--        #refreshButton {-->
+<!--            background-color: #28a745;-->
+<!--        }-->
+<!--        #refreshButton:hover {-->
+<!--            background-color: #218838;-->
+<!--        }-->
+<!--        p {-->
+<!--            color: #666;-->
+<!--            margin: 10px 0;-->
+<!--            font-size: 16px;-->
+<!--        }-->
+<!--        .status-success {-->
+<!--            color: #28a745;-->
+<!--        }-->
+<!--        .status-error {-->
+<!--            color: #dc3545;-->
+<!--        }-->
+<!--        .status-warning {-->
+<!--            color: #ffc107;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h1>Face Matching</h1>-->
+<!--    <button id="startMatchButton">Start Match</button>-->
+<!--    <button id="stopMatchButton">Stop Match</button>-->
+<!--    <button id="refreshButton">Refresh</button>-->
+<!--    <div class="video-container">-->
+<!--        <video id="video" autoplay playsinline></video>-->
+<!--        <img id="matchFrame" class="match-frame" alt="Matched face frame" />-->
+<!--    </div>-->
+<!--    <p id="status">Waiting to start...</p>-->
+<!--</div>-->
 
-<script>
-    const socket = io("http://localhost:5000", {
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 20000,
-        autoConnect: true,
-        transports: ['websocket', 'polling']
-    });
+<!--<script>-->
+<!--    const socket = io("http://localhost:5000", {-->
+<!--        reconnection: true,-->
+<!--        reconnectionAttempts: 10,-->
+<!--        reconnectionDelay: 1000,-->
+<!--        reconnectionDelayMax: 5000,-->
+<!--        timeout: 20000,-->
+<!--        autoConnect: true,-->
+<!--        transports: ['websocket', 'polling']-->
+<!--    });-->
 
-    const video = document.getElementById("video");
-    const matchFrame = document.getElementById("matchFrame");
-    const statusText = document.getElementById("status");
-    const startMatchButton = document.getElementById("startMatchButton");
-    const stopMatchButton = document.getElementById("stopMatchButton");
-    const refreshButton = document.getElementById("refreshButton");
-    
-    let stream = null;
-    let isConnected = false;
-    let isMatching = false;
-    let captureInterval = null;
+<!--    const video = document.getElementById("video");-->
+<!--    const matchFrame = document.getElementById("matchFrame");-->
+<!--    const statusText = document.getElementById("status");-->
+<!--    const startMatchButton = document.getElementById("startMatchButton");-->
+<!--    const stopMatchButton = document.getElementById("stopMatchButton");-->
+<!--    const refreshButton = document.getElementById("refreshButton");-->
+<!--    -->
+<!--    let stream = null;-->
+<!--    let isConnected = false;-->
+<!--    let isMatching = false;-->
+<!--    let captureInterval = null;-->
 
-    function updateStatus(message, type = 'normal') {
-        statusText.textContent = message;
-        statusText.className = type ? `status-${type}` : '';
-    }
+<!--    function updateStatus(message, type = 'normal') {-->
+<!--        statusText.textContent = message;-->
+<!--        statusText.className = type ? `status-${type}` : '';-->
+<!--    }-->
 
-    function showMatchFrame(frameData, boundingBox) {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
+<!--    function showMatchFrame(frameData, boundingBox) {-->
+<!--        const canvas = document.createElement("canvas");-->
+<!--        const ctx = canvas.getContext("2d");-->
+<!--        const img = new Image();-->
 
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            
-            // Draw the base image
-            ctx.drawImage(img, 0, 0);
-            
-            // Draw bounding box if available
-            if (boundingBox) {
-                ctx.strokeStyle = "red";
-                ctx.lineWidth = 3;
-                ctx.setLineDash([5, 5]);
-                const { x, y, width, height } = boundingBox;
-                ctx.strokeRect(x, y, width, height);
-            }
+<!--        img.onload = () => {-->
+<!--            canvas.width = img.width;-->
+<!--            canvas.height = img.height;-->
+<!--            -->
+<!--            // Draw the base image-->
+<!--            ctx.drawImage(img, 0, 0);-->
+<!--            -->
+<!--            // Draw bounding box if available-->
+<!--            if (boundingBox) {-->
+<!--                ctx.strokeStyle = "red";-->
+<!--                ctx.lineWidth = 3;-->
+<!--                ctx.setLineDash([5, 5]);-->
+<!--                const { x, y, width, height } = boundingBox;-->
+<!--                ctx.strokeRect(x, y, width, height);-->
+<!--            }-->
 
-            // Set the processed image and fade it in
-            matchFrame.src = canvas.toDataURL();
-            requestAnimationFrame(() => {
-                matchFrame.style.opacity = "1";
-                video.style.opacity = "0.3"; // Semi-transparent video feed
-            });
-        };
+<!--            // Set the processed image and fade it in-->
+<!--            matchFrame.src = canvas.toDataURL();-->
+<!--            requestAnimationFrame(() => {-->
+<!--                matchFrame.style.opacity = "1";-->
+<!--                video.style.opacity = "0.3"; // Semi-transparent video feed-->
+<!--            });-->
+<!--        };-->
 
-        img.src = frameData;
-    }
+<!--        img.src = frameData;-->
+<!--    }-->
 
-    function captureAndSendFrame() {
-        if (!stream?.active || !isMatching) return;
+<!--    function captureAndSendFrame() {-->
+<!--        if (!stream?.active || !isMatching) return;-->
 
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext("2d");
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+<!--        const canvas = document.createElement("canvas");-->
+<!--        canvas.width = video.videoWidth;-->
+<!--        canvas.height = video.videoHeight;-->
+<!--        const context = canvas.getContext("2d");-->
+<!--        context.drawImage(video, 0, 0, canvas.width, canvas.height);-->
 
-        try {
-            const imageData = canvas.toDataURL("image/jpeg", 0.7);
-            socket.emit("send_match_frame", { image: imageData });
-        } catch (err) {
-            console.error("Error sending frame:", err);
-            updateStatus("Error sending frame to server", "error");
-        }
-    }
+<!--        try {-->
+<!--            const imageData = canvas.toDataURL("image/jpeg", 0.7);-->
+<!--            socket.emit("send_match_frame", { image: imageData });-->
+<!--        } catch (err) {-->
+<!--            console.error("Error sending frame:", err);-->
+<!--            updateStatus("Error sending frame to server", "error");-->
+<!--        }-->
+<!--    }-->
 
-    async function startMatching() {
-        if (!isConnected) {
-            updateStatus("Not connected to server. Please wait...", "warning");
-            socket.connect();
-            return;
-        }
+<!--    async function startMatching() {-->
+<!--        if (!isConnected) {-->
+<!--            updateStatus("Not connected to server. Please wait...", "warning");-->
+<!--            socket.connect();-->
+<!--            return;-->
+<!--        }-->
 
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 640 },
-                    height: { ideal: 480 },
-                    facingMode: "user"
-                }
-            });
+<!--        try {-->
+<!--            stream = await navigator.mediaDevices.getUserMedia({-->
+<!--                video: {-->
+<!--                    width: { ideal: 640 },-->
+<!--                    height: { ideal: 480 },-->
+<!--                    facingMode: "user"-->
+<!--                }-->
+<!--            });-->
 
-            video.srcObject = stream;
-            video.style.opacity = "1";
-            matchFrame.style.opacity = "0";
-            
-            isMatching = true;
-            socket.emit("start_match");
-            startMatchButton.disabled = true;
-            stopMatchButton.disabled = false;
+<!--            video.srcObject = stream;-->
+<!--            video.style.opacity = "1";-->
+<!--            matchFrame.style.opacity = "0";-->
+<!--            -->
+<!--            isMatching = true;-->
+<!--            socket.emit("start_match");-->
+<!--            startMatchButton.disabled = true;-->
+<!--            stopMatchButton.disabled = false;-->
 
-            // Start capturing frames after video is loaded
-            video.onloadedmetadata = () => {
-                captureInterval = setInterval(captureAndSendFrame, 1000); // Capture every second
-                captureAndSendFrame(); // Capture first frame immediately
-            };
+<!--            // Start capturing frames after video is loaded-->
+<!--            video.onloadedmetadata = () => {-->
+<!--                captureInterval = setInterval(captureAndSendFrame, 1000); // Capture every second-->
+<!--                captureAndSendFrame(); // Capture first frame immediately-->
+<!--            };-->
 
-        } catch (err) {
-            console.error("Error accessing webcam:", err);
-            updateStatus("Error accessing webcam. Please check permissions.", "error");
-            stopMatching();
-        }
-    }
+<!--        } catch (err) {-->
+<!--            console.error("Error accessing webcam:", err);-->
+<!--            updateStatus("Error accessing webcam. Please check permissions.", "error");-->
+<!--            stopMatching();-->
+<!--        }-->
+<!--    }-->
 
-    function stopMatching() {
-        isMatching = false;
-        socket.emit("stop_match");
-        startMatchButton.disabled = false;
-        stopMatchButton.disabled = true;
+<!--    function stopMatching() {-->
+<!--        isMatching = false;-->
+<!--        socket.emit("stop_match");-->
+<!--        startMatchButton.disabled = false;-->
+<!--        stopMatchButton.disabled = true;-->
 
-        if (captureInterval) {
-            clearInterval(captureInterval);
-            captureInterval = null;
-        }
+<!--        if (captureInterval) {-->
+<!--            clearInterval(captureInterval);-->
+<!--            captureInterval = null;-->
+<!--        }-->
 
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
+<!--        if (stream) {-->
+<!--            stream.getTracks().forEach(track => track.stop());-->
+<!--            stream = null;-->
+<!--        }-->
 
-        video.srcObject = null;
-        video.style.opacity = "1";
-        matchFrame.style.opacity = "0";
-        updateStatus("Match stopped");
-    }
+<!--        video.srcObject = null;-->
+<!--        video.style.opacity = "1";-->
+<!--        matchFrame.style.opacity = "0";-->
+<!--        updateStatus("Match stopped");-->
+<!--    }-->
 
-    function refreshSystem() {
-        stopMatching();
-        socket.emit("refresh_data");
-        updateStatus("Refreshing data...");
-        
-        // Reset UI state
-        matchFrame.style.opacity = "0";
-        video.style.opacity = "1";
-    }
+<!--    function refreshSystem() {-->
+<!--        stopMatching();-->
+<!--        socket.emit("refresh_data");-->
+<!--        updateStatus("Refreshing data...");-->
+<!--        -->
+<!--        // Reset UI state-->
+<!--        matchFrame.style.opacity = "0";-->
+<!--        video.style.opacity = "1";-->
+<!--    }-->
 
-    // Button Event Listeners
-    startMatchButton.addEventListener("click", startMatching);
-    stopMatchButton.addEventListener("click", stopMatching);
-    refreshButton.addEventListener("click", refreshSystem);
+<!--    // Button Event Listeners-->
+<!--    startMatchButton.addEventListener("click", startMatching);-->
+<!--    stopMatchButton.addEventListener("click", stopMatching);-->
+<!--    refreshButton.addEventListener("click", refreshSystem);-->
 
-    // Socket Event Handlers
-    socket.on("match_result", (data) => {
-        if (data.result === "Match found") {
-            updateStatus(`Match found for user: ${data.user} (Confidence: ${data.Confidence})`, "success");
-            showMatchFrame(data.frame, data.bounding_box);
-        } else if (data.result.startsWith("Error:")) {
-            updateStatus(data.result, "warning");
-        } else {
-            updateStatus(data.result);
-            if (isMatching && video.srcObject) {
-                captureAndSendFrame();
-            }
-        }
-    });
+<!--    // Socket Event Handlers-->
+<!--    socket.on("match_result", (data) => {-->
+<!--        if (data.result === "Match found") {-->
+<!--            updateStatus(`Match found for user: ${data.user} (Confidence: ${data.Confidence})`, "success");-->
+<!--            showMatchFrame(data.frame, data.bounding_box);-->
+<!--        } else if (data.result.startsWith("Error:")) {-->
+<!--            updateStatus(data.result, "warning");-->
+<!--        } else {-->
+<!--            updateStatus(data.result);-->
+<!--            if (isMatching && video.srcObject) {-->
+<!--                captureAndSendFrame();-->
+<!--            }-->
+<!--        }-->
+<!--    });-->
 
-    socket.on("connect", () => {
-        console.log("Connected to server");
-        isConnected = true;
-        updateStatus("Connected to server");
-        startMatchButton.disabled = false;
-        stopMatchButton.disabled = true;
-    });
+<!--    socket.on("connect", () => {-->
+<!--        console.log("Connected to server");-->
+<!--        isConnected = true;-->
+<!--        updateStatus("Connected to server");-->
+<!--        startMatchButton.disabled = false;-->
+<!--        stopMatchButton.disabled = true;-->
+<!--    });-->
 
-    socket.on("disconnect", () => {
-        console.log("Disconnected from server");
-        isConnected = false;
-        updateStatus("Disconnected from server. Attempting to reconnect...", "error");
-        stopMatching();
-    });
+<!--    socket.on("disconnect", () => {-->
+<!--        console.log("Disconnected from server");-->
+<!--        isConnected = false;-->
+<!--        updateStatus("Disconnected from server. Attempting to reconnect...", "error");-->
+<!--        stopMatching();-->
+<!--    });-->
 
-    socket.on("reconnect", (attemptNumber) => {
-        console.log(`Reconnected after ${attemptNumber} attempts`);
-        updateStatus("Reconnected to server", "success");
-    });
+<!--    socket.on("reconnect", (attemptNumber) => {-->
+<!--        console.log(`Reconnected after ${attemptNumber} attempts`);-->
+<!--        updateStatus("Reconnected to server", "success");-->
+<!--    });-->
 
-    socket.on("reconnect_attempt", (attemptNumber) => {
-        console.log(`Reconnection attempt ${attemptNumber}`);
-        updateStatus(`Reconnecting... (Attempt ${attemptNumber})`, "warning");
-    });
+<!--    socket.on("reconnect_attempt", (attemptNumber) => {-->
+<!--        console.log(`Reconnection attempt ${attemptNumber}`);-->
+<!--        updateStatus(`Reconnecting... (Attempt ${attemptNumber})`, "warning");-->
+<!--    });-->
 
-    socket.on("reconnect_error", (error) => {
-        console.error("Reconnection error:", error);
-        updateStatus("Error reconnecting to server", "error");
-    });
+<!--    socket.on("reconnect_error", (error) => {-->
+<!--        console.error("Reconnection error:", error);-->
+<!--        updateStatus("Error reconnecting to server", "error");-->
+<!--    });-->
 
-    socket.on("reconnect_failed", () => {
-        console.error("Failed to reconnect");
-        updateStatus("Failed to reconnect. Please refresh the page.", "error");
-        startMatchButton.disabled = true;
-        stopMatchButton.disabled = true;
-    });
+<!--    socket.on("reconnect_failed", () => {-->
+<!--        console.error("Failed to reconnect");-->
+<!--        updateStatus("Failed to reconnect. Please refresh the page.", "error");-->
+<!--        startMatchButton.disabled = true;-->
+<!--        stopMatchButton.disabled = true;-->
+<!--    });-->
 
-    socket.on("refresh_complete", () => {
-        updateStatus("Data refreshed successfully!", "success");
-        startMatchButton.disabled = false;
-    });
+<!--    socket.on("refresh_complete", () => {-->
+<!--        updateStatus("Data refreshed successfully!", "success");-->
+<!--        startMatchButton.disabled = false;-->
+<!--    });-->
 
-    socket.on("error", (error) => {
-        console.error("Socket error:", error);
-        updateStatus("Connection error. Please try again.", "error");
-    });
+<!--    socket.on("error", (error) => {-->
+<!--        console.error("Socket error:", error);-->
+<!--        updateStatus("Connection error. Please try again.", "error");-->
+<!--    });-->
 
-    socket.on("connect_error", (error) => {
-        console.error("WebSocket connection error:", error);
-        updateStatus("WebSocket connection error.", "error");
-    });
+<!--    socket.on("connect_error", (error) => {-->
+<!--        console.error("WebSocket connection error:", error);-->
+<!--        updateStatus("WebSocket connection error.", "error");-->
+<!--    });-->
 
-    // Initialize button states
-    stopMatchButton.disabled = true;
-</script>
-</body>
-</html>
+<!--    // Initialize button states-->
+<!--    stopMatchButton.disabled = true;-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
